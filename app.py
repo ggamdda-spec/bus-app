@@ -111,16 +111,16 @@ if station_query:
         for _, row in df_times.iterrows():
             # 상행 (0~4열), 하행 (5~9열)
             if has_all_values(row.iloc[0:5]) and station_query in str(row.iloc[0]):
-                up_res.append({"정류장": row.iloc[0], "출발": format_time(row.iloc[1]), "도착": format_time(row.iloc[2]), "노선": row.iloc[3], "sort": time_to_minutes(row.iloc[1])})
+                up_res.append({"정류장": row.iloc[0], "강진출발": format_time(row.iloc[1]), "도착": format_time(row.iloc[2]), "노선": row.iloc[3], "sort": time_to_minutes(row.iloc[1])})
             if has_all_values(row.iloc[5:10]) and station_query in str(row.iloc[5]):
-                down_res.append({"정류장": row.iloc[5], "출발": format_time(row.iloc[6]), "도착": format_time(row.iloc[7]), "노선": row.iloc[8], "sort": time_to_minutes(row.iloc[6])})
+                down_res.append({"정류장": row.iloc[5], "강진출발": format_time(row.iloc[6]), "도착": format_time(row.iloc[7]), "노선": row.iloc[8], "sort": time_to_minutes(row.iloc[6])})
 
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("🔼 상행 (시내방향 등)")
+        st.subheader("🔼 상행  ")
         if up_res: st.dataframe(pd.DataFrame(up_res).sort_values("sort").drop(columns="sort"), use_container_width=True, hide_index=True)
         else: st.write("검색 결과가 없습니다.")
     with col2:
-        st.subheader("🔽 하행 (읍내방향 등)")
+        st.subheader("🔽 하행  ")
         if down_res: st.dataframe(pd.DataFrame(down_res).sort_values("sort").drop(columns="sort"), use_container_width=True, hide_index=True)
         else: st.write("검색 결과가 없습니다.")
