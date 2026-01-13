@@ -80,18 +80,30 @@ if 'auto_station' not in st.session_state:
 
 # GPS 버튼
 if st.button("🌐 현재 위치로 찾기"):
+    # 1. 위치 정보 요청 시작
     loc = get_geolocation()
-    if loc and 'coords' in loc:
-        if df_gps is not None:
-            try:
-                lat, lon = loc['coords']['latitude'], loc['coords']['longitude']
-                df_gps['dist'] = df_gps.apply(lambda r: haversine(lat, lon, float(r['위도']), float(r['경도'])), axis=1)
-                st.session_state.auto_station = df_gps.sort_values('dist').iloc[0]['정류장명']
+    
+    # 2. 데이터가 올 때까지 안내 메시지 표시
+    if loc is None:
+        st.warning("📍 브라우저 상단(또는 하단)에 뜨는 '위치 정보 공유' 팝업에서 **[허용]**을 눌러주세요.")
+        st.info("이미 허용했다면 GPS 신호를 수신하는 중이니 1~2초만 기다려 주세요.")
+    elif 'coords' in loc:
+        try:
+            lat, lon = loc['coords']['latitude'], loc['coords']['longitude']
+            
+            if df_gps is not None:
+                # 거리 계산
+                df_gps['dist'] = df_gps.apply(
+                    lambda r: haversine(lat, lon, float(r['위도']), float(r['경도'])), axis=1
+                )
+                nearest = df_gps.sort_values('dist').iloc[0]
+                st.session_state.auto_station = nearest['정류장명']
+                st.success(f"✅ 확인 완료! 가장 가까운 **[{st.session_state.auto_station}]** 정류장입니다.")
                 st.rerun()
-            except Exception as e:
-                st.error(f"거리 계산 오류: {e}")
+        except Exception as e:
+            st.error(f"데이터 계산 오류: {e}. 엑셀의 위도/경도가 숫자인지 확인하세요.")
     else:
-        st.info("브라우저의 위치 권한을 확인해주세요.")
+        st.error("기기에서 위치 정보를 제공하지 않습니다. GPS가 켜져 있는지 확인하세요.")
 
 # 검색창
 station_query = st.text_input("정류장 이름을 입력하세요:", value=st.session_state.auto_station)
