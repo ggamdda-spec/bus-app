@@ -95,7 +95,7 @@ if st.button("🌐 현재 위치로 정류장 자동 찾기"):
                     axis=1
                 )
                 # 가장 가까운 정류장 추출
-                nearest_name = df_gps.sort_values('dist').iloc[0]['정류장명']
+                nearest_name = df_gps.sort_values('dist').iloc[0]['정류장']
                 st.session_state.auto_station = nearest_name
                 st.success(f"가장 가까운 **[{nearest_name}]** 정류장을 찾았습니다!")
                 st.rerun() # 결과 즉시 반영
