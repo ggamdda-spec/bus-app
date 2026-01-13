@@ -99,7 +99,7 @@ if find_me:
                     lambda r: haversine(curr_lat, curr_lon, r['위도'], r['경도']), axis=1
                 )
                 nearest = df_gps.sort_values('dist').iloc[0]
-                st.session_state.auto_station = nearest['정류장명']
+                st.session_state.auto_station = nearest['정류장']
                 st.success(f"✅ 확인 완료! 가장 가까운 **[{st.session_state.auto_station}]** 정류장입니다.")
                 st.rerun()
 
