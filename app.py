@@ -79,20 +79,28 @@ with col_btn:
     find_me = st.button("🌐 현재 위치 확인")
 
 if find_me:
+    # component를 다시 호출하여 최신 위치를 요청
     loc = get_geolocation()
-    if loc and 'coords' in loc:
-        curr_lat = loc['coords']['latitude']
-        curr_lon = loc['coords']['longitude']
-        
-        if df_gps is not None:
-            df_gps['dist'] = df_gps.apply(
-                lambda r: haversine(curr_lat, curr_lon, r['위도'], r['경도']), axis=1
-            )
-            nearest = df_gps.sort_values('dist').iloc[0]
-            st.session_state.auto_station = nearest['정류장명']
-            st.success(f"가장 가까운 **[{st.session_state.auto_station}]** 정류장을 찾았습니다!")
-    else:
-        st.warning("위치 정보를 가져올 수 없습니다. 브라우저 권한을 확인해 주세요.")
+    
+    with st.spinner('📍 GPS 신호를 수신 중입니다...'):
+        if loc is None:
+            # 사용자가 클릭한 직후 데이터가 없을 때 잠시 대기 안내
+            st.info("브라우저 상단에서 '위치 권한 허용'을 눌러주세요. 이미 허용했다면 잠시만 기다려 주세요.")
+        elif 'coords' in loc:
+            curr_lat = loc['coords']['latitude']
+            curr_lon = loc['coords']['longitude']
+            
+            if df_gps is not None:
+                # 거리 계산
+                df_gps['dist'] = df_gps.apply(
+                    lambda r: haversine(curr_lat, curr_lon, r['위도'], r['경도']), axis=1
+                )
+                nearest = df_gps.sort_values('dist').iloc[0]
+                st.session_state.auto_station = nearest['정류장명']
+                st.success(f"가장 가까운 **[{st.session_state.auto_station}]** 정류장을 찾았습니다!")
+                st.rerun()
+        else:
+            st.error("위치 정보를 가져오는 데 실패했습니다. 기기의 GPS가 켜져 있는지 확인해 주세요.")
 
 st.divider()
 
